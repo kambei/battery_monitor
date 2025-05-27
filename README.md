@@ -27,6 +27,13 @@ A simple GTK-based desktop application for Fedora Linux that monitors your batte
 * `paplay` (typically from `pulseaudio-utils` or similar, for playing notification sounds)
 * **For GNOME users (Recommended):** An active AppIndicator support extension (e.g., "AppIndicator and KStatusNotifierItem Support" from extensions.gnome.org) for the tray icon to be visible.
 
+## Use
+
+In `battery_monitor_gui.desktop` at Exec put your `battery_monitor_gui.py` location.
+
+Then add `battery_monitor_gui.desktop` in your home under `.local/share/applications` folder.
+
+
 <br>
 
 ## Support Me
@@ -34,3 +41,4 @@ A simple GTK-based desktop application for Fedora Linux that monitors your batte
 If you find this application helpful, consider supporting me on Ko-fi!
 
 [![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/kambei)
+
