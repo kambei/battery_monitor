@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=Battery Monitor
+Comment=Displays battery level and sends low battery notifications
+Exec=/home/kambei/scripts/battery_monitor/battery_monitor_gui.py
+Icon=battery-symbolic
+# Or, if you have a custom icon:
+# Icon=/path/to/your/custom_icon.png
+Terminal=false
+Type=Application
+Categories=Utility;System;
+Keywords=battery;power;monitor;notification;gtk;
+StartupNotify=true
