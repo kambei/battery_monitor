@@ -20,16 +20,22 @@ import os
 # --- Configuration ---
 LOW_BATTERY_THRESHOLD = 30  # Percentage
 CHECK_INTERVAL_SECONDS = 60  # Interval for checking battery status in seconds
-APP_ID = "com.example.batterymonitorgui" # Unique ID for AppIndicator
+APP_ID = "dev.kambei.batterymonitorgui" # Unique ID for AppIndicator
 NOTIFICATION_APP_NAME = "BatteryMonitorGUI"
-NOTIFICATION_ICON = "battery-caution-symbolic"
+NOTIFICATION_ICON = "battery-caution"
 LOW_BATTERY_SOUND_FILE = "/usr/share/sounds/freedesktop/stereo/dialog-warning.oga"
 
 # Icon names for AppIndicator
-TRAY_ICON_NAME_DEFAULT = "battery-symbolic"
-TRAY_ICON_NAME_LOW = "battery-empty-symbolic"
-TRAY_ICON_NAME_CHARGING = "battery-good-charging-symbolic"
-TRAY_ICON_NAME_ERROR = "dialog-error-symbolic" # For when battery info fails
+TRAY_ICON_NAME_FULL = "battery-full"
+TRAY_ICON_NAME_GOOD = "battery-good"
+TRAY_ICON_NAME_MEDIUM = "battery-caution"
+TRAY_ICON_NAME_LOW = "battery-low"
+TRAY_ICON_NAME_EMPTY = "battery-empty"
+TRAY_ICON_NAME_CHARGING = "battery-good-charging"
+TRAY_ICON_NAME_CHARGING_FULL = "battery-full-charging"
+TRAY_ICON_NAME_ERROR = "dialog-error"  # For when battery info fails
+TRAY_ICON_NAME_DEFAULT = "battery"  # Fallback
+
 
 class BatteryMonitorWindow(Gtk.Window):
     def __init__(self):
@@ -91,7 +97,7 @@ class BatteryMonitorWindow(Gtk.Window):
         self.indicator = appindicator.Indicator.new(
             APP_ID,
             TRAY_ICON_NAME_DEFAULT, # Initial icon
-            appindicator.IndicatorCategory.APPLICATION_STATUS)
+            appindicator.IndicatorCategory.HARDWARE)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
 
         menu = Gtk.Menu()
@@ -186,16 +192,36 @@ class BatteryMonitorWindow(Gtk.Window):
             if is_discharging:
                 current_status_text = "Discharging"
                 self.level_bar.set_mode(Gtk.LevelBarMode.CONTINUOUS)
-                icon_to_set = TRAY_ICON_NAME_DEFAULT
-                if percentage <= LOW_BATTERY_THRESHOLD:
+                if percentage > 95:
+                    icon_to_set = TRAY_ICON_NAME_FULL
+                elif percentage > 70:
+                    icon_to_set = TRAY_ICON_NAME_GOOD
+                elif percentage > LOW_BATTERY_THRESHOLD:
+                    icon_to_set = TRAY_ICON_NAME_MEDIUM
+                elif percentage > 10:
                     icon_to_set = TRAY_ICON_NAME_LOW
+                else:
+                    icon_to_set = TRAY_ICON_NAME_EMPTY
             elif is_charging:
                 current_status_text = "Charging"
-                icon_to_set = TRAY_ICON_NAME_CHARGING
-            else: # Not discharging, not charging -> likely Full or other
-                if percentage > 98: current_status_text = "Full"
-                else: current_status_text = "Plugged In"
-                icon_to_set = TRAY_ICON_NAME_DEFAULT
+                if percentage > 98:
+                    icon_to_set = TRAY_ICON_NAME_CHARGING_FULL
+                else:
+                    icon_to_set = TRAY_ICON_NAME_CHARGING
+            else:  # Not discharging, not charging -> likely Full or other
+                if percentage > 98:
+                    current_status_text = "Full"
+                    icon_to_set = TRAY_ICON_NAME_FULL
+                else:
+                    current_status_text = "Plugged In"
+                    if percentage > 95:
+                        icon_to_set = TRAY_ICON_NAME_FULL
+                    elif percentage > 70:
+                        icon_to_set = TRAY_ICON_NAME_GOOD
+                    elif percentage > LOW_BATTERY_THRESHOLD:
+                        icon_to_set = TRAY_ICON_NAME_MEDIUM
+                    else:
+                        icon_to_set = TRAY_ICON_NAME_LOW
 
             self.status_label.set_markup(f"<b>Battery:</b> {percentage:.0f}% <i>({current_status_text})</i>")
             self.level_bar.set_value(percentage)
@@ -216,6 +242,7 @@ class BatteryMonitorWindow(Gtk.Window):
             self.indicator.set_icon_full(icon_to_set, ", ".join(tooltip_parts))
 
         return True
+
 
 def main():
     print("Starting Battery Monitor GUI (using AppIndicator3 if available)...")
