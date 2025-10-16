@@ -171,7 +171,7 @@ class BatteryMonitorWindow(Gtk.Window):
             print(f"GUI: Sound file not found: {sound_file_path}")
             return
         try:
-            subprocess.run(['paplay', sound_file_path], check=True, capture_output=True)
+            subprocess.run(['paplay', '--volume', '65536', sound_file_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             print(f"GUI: Played sound: {sound_file_path}")
         except Exception as e:
             print(f"GUI: Error playing sound: {e}")
@@ -242,7 +242,6 @@ class BatteryMonitorWindow(Gtk.Window):
             self.indicator.set_icon_full(icon_to_set, ", ".join(tooltip_parts))
 
         return True
-
 
 def main():
     print("Starting Battery Monitor GUI (using AppIndicator3 if available)...")
